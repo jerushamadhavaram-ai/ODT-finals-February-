@@ -1,0 +1,65 @@
+machine import Pin
+import time
+import neopixel
+import random
+pb1 = Pin(5, Pin.IN, Pin.PULL_UP)
+pb2 = Pin(12, Pin.IN, Pin.PULL_UP)
+led1 = Pin(4, Pin.OUT)
+led2 = Pin(18, Pin.OUT)
+disc = neopixel.NeoPixel(Pin(21), 16)
+#random for choosing
+correct = random.randint(1, 2)
+print("Bomb Activated!")
+time.sleep(1)
+count = 10
+last_time = time.ticks_ms()
+speed = 0.3 # normal blink speed
+while True:
+if pb1.value() == 0:
+if correct == 1:
+print("BOMB DEFUSED")
+for i in range(16):
+disc[i] = (0, 255, 0) # Green
+else:
+print("BOMB BLAST")
+for i in range(16):
+disc[i] = (255, 0, 0) # Red
+disc.write()
+break
+if pb2.value() == 0:
+if correct == 2:
+print("BOMB DEFUSED")
+for i in range(16):
+disc[i] = (0, 255, 0)
+else:
+print("BOMB BLAST")
+for i in range(16):
+disc[i] = (255, 0, 0)
+disc.write()
+break #breaking the loop to go to other loopt
+#countdown
+current = time.ticks_ms()
+if time.ticks_diff(current, last_time) >= 1000:
+print(count)
+count -= 1
+last_time = current
+# Faster blinking in last 5 seconds
+if count <= 5:
+speed = 0.08
+else:
+speed = 0.3
+#Alternate blink
+led1.on()
+led2.off()
+time.sleep(speed)
+led1.off()
+led2.on()
+time.sleep(speed)
+#ending the round
+if count < 0:
+print("TIME UP! BOMB BLAST")
+for i in range(16):
+disc[i] = (255, 0, 0)
+disc.write()
+break
+time.sleep(0.2)
